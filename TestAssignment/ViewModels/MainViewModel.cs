@@ -1,6 +1,8 @@
 ﻿using ReactiveUI;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TestAssignment.Models;
+using TestAssignment.Parser;
 
 namespace TestAssignment.ViewModels;
 
@@ -16,32 +18,35 @@ public class MainViewModel : ViewModelBase
 
     public MainViewModel()
     {
-        Playlists = new List<PlaylistModel>
+        Playlists = new List<PlaylistModel>();
+        LoadPlaylists();
+    }
+
+    private void LoadPlaylists()
+    {
+        foreach (var playlistUrl in Constants.PlaylistUrls)
         {
-            new PlaylistModel
+            var url = playlistUrl;
+
+            _ = Task.Run(async () => 
             {
-                Icon = "https://m.media-amazon.com/images/I/51ktq-qEIcL.jpg",
-                Type = "Test Playlist Type",
-                Name = "Test Playlist Name",
-                Description = "Test Playlist Description",
-                Songs = new List<SongModel>
-                {
-                    new SongModel
-                    {
-                        Name = "Test Song Name 1",
-                        Duration = "Test Song Duration 1",
-                        AlbumName = "Test Song Album Name 1",
-                        ArtistName = "Test Song Artist Name 1"
-                    },
-                    new SongModel
-                    {
-                        Name = "Test Song Name 2",
-                        Duration = "Test Song Duration 2",
-                        AlbumName = "Test Song Album Name 2",
-                        ArtistName = "Test Song Artist Name 2"
-                    },
-                },
-            },
-        };
+                await LoadPlaylistAsync(url);
+            });
+        }
+    }
+
+    private async Task LoadPlaylistAsync(string playlistUrl)
+    {
+        var playlist = await AmazonPlaylistParser.ParsePlaylistAsync(playlistUrl);
+        if (playlist != null)
+        {
+            var playlists = new List<PlaylistModel>();
+            if (Playlists != null)
+            {
+                playlists.AddRange(Playlists);
+            }
+            playlists?.Add(playlist);
+            Playlists = playlists;
+        }
     }
 }
