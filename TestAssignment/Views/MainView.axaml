@@ -1,4 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -15,16 +16,34 @@
   <ListBox ItemsSource="{Binding Playlists}">
     <ListBox.ItemTemplate>
       <DataTemplate>
-        <StackPanel Orientation="Horizontal">
-          <Image Height="128"
-                 Width="128"
-                 Source="{Binding Icon}" />
-          <StackPanel Orientation="Vertical">
-            <TextBlock Text="{Binding Type}" />
-            <TextBlock Text="{Binding Name}" />
-            <TextBlock Text="{Binding Description}" />
-          </StackPanel>          
-        </StackPanel>
+        <Expander>
+          <Expander.Header>
+            <StackPanel Orientation="Horizontal"
+                        Margin="8">
+              <Image Height="128"
+                      Width="128"
+                      asyncImageLoader:ImageLoader.Source="{Binding Icon}" />
+              <StackPanel Orientation="Vertical"
+                          Margin="8">
+                <StackPanel Orientation="Horizontal">
+                  <TextBlock Text="{Binding Type, StringFormat='{}[{0}] '}}" />
+                  <TextBlock Text="{Binding Name}" />                  
+                </StackPanel>
+                <TextBlock Text="{Binding Description}" />
+              </StackPanel>          
+            </StackPanel>
+          </Expander.Header>
+        <DataGrid ItemsSource="{Binding Songs}"
+                  IsReadOnly="True"
+                  CanUserResizeColumns="True">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Name"  Binding="{Binding Name}"/>
+            <DataGridTextColumn Header="Artist" Binding="{Binding ArtistName}" />
+            <DataGridTextColumn Header="Album"  Binding="{Binding AlbumName}"/>
+            <DataGridTextColumn Header="Duration" Binding="{Binding Duration}" />
+          </DataGrid.Columns>
+        </DataGrid>
+        </Expander>
       </DataTemplate>
     </ListBox.ItemTemplate>
   </ListBox>
